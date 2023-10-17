@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Typography} from "antd";
 import Icon from "@ant-design/icons";
+import {COLORS} from "../../../utils/constants.tsx";
 
 interface IMenuItem {
     title: string
@@ -37,10 +38,10 @@ const MenuItem = ({title, icon, setScreen}: IMenuItem) => {
                     justifyContent: 'center',
                     alignItems: 'center'
                 }}>
-                <Icon component={icon} style={{fontSize: 20, color: isOver ? 'white' : '#bbbabf'}}/>
+                <Icon component={icon} style={{fontSize: 20, color: isOver ? 'white' : COLORS.TEXT_COLOR}}/>
             </div>
             <Typography.Title level={5}
-                              style={{color: isOver ? 'white' : '#878ca0', margin: 0}}>{title}</Typography.Title>
+                              style={{color: isOver ? 'white' : COLORS.TEXT_COLOR, margin: 0}}>{title}</Typography.Title>
         </div>
     );
 };

@@ -5,3 +5,7 @@ export const SCREENS = {
     CARD: 'card'
 }
 
+export const COLORS = {
+    TEXT_COLOR: '#333446'
+}
+
