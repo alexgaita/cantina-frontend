@@ -1,17 +1,16 @@
 // interface ICheckout {
 //
 // }
-import { useContext } from "react";
 import { Button, Typography} from "antd";
 import {COLORS} from "../../../utils/constants.tsx";
 import CheckoutItem from "../CheckoutItem/CheckoutItem.tsx";
-import { useSnackbar } from "../../../contexts/SnackbarContext.tsx";
+import useCheckoutQuery from "../../../query/useCheckoutQuery.tsx";
 
 const imageUrl = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8fA%3D%3D&w=1000&q=80"
 
 const Checkout = () => {
 
-    const {failedNotification} = useSnackbar();
+    const {handleSendOrder} = useCheckoutQuery()
 
 
     return (
@@ -59,7 +58,7 @@ const Checkout = () => {
                     <Typography.Text strong style={{color: COLORS.TEXT_COLOR}}>Total </Typography.Text>
                     <Typography.Text strong style={{color: COLORS.TEXT_COLOR}}>200 lei </Typography.Text>
                 </div>
-                <Button onClick={()=>failedNotification("Comanda trimisa","Comanda a fost efectuata cu succes")} style={{marginTop:'auto'}}>Place Order</Button>
+                <Button onClick={()=>handleSendOrder({})} style={{marginTop:'auto'}}>Place Order</Button>
             </div>
 
 

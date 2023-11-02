@@ -49,7 +49,7 @@ export const SnackBarProvider = ({ children }: ISnackBarProvider) => {
   );
 };
 
-export const useSnackbar = () => {
+export const useSnackbar = ():ISnackbarContext => {
   const context = useContext(SnackbarContext);
   return context;
 };

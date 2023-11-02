@@ -124,6 +124,7 @@ const HomeScreen = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                        borderTop: "0.5px solid rgba(0, 0, 0, 0.24)",
                         borderRadius: '20px',
                         padding: 10,
                         boxSizing: 'border-box',
