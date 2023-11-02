@@ -2,6 +2,8 @@ import {LeftSideMenu} from "./components/LeftSideMenu";
 import {useState} from "react";
 import {SCREENS} from "./utils/constants.tsx";
 import HomeScreen from "./components/HomeScreen/HomeScreen.tsx";
+import {notification} from 'antd';
+
 
 const App = () => {
 
@@ -10,7 +12,7 @@ const App = () => {
     const renderRightSide = () => {
         switch (selectedScreen) {
             case SCREENS.HOME:
-                return <HomeScreen/>
+                return <HomeScreen />
             case SCREENS.SETTINGS:
                 return <div>Settings</div>
             case SCREENS.CARD:
