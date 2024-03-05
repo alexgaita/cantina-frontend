@@ -5,6 +5,9 @@
 
 import { LogLevel } from "@azure/msal-browser";
 
+const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID ?? "";
+const tenantId = import.meta.env.VITE_AZURE_TENANT_ID ?? "";
+
 /**
  * Configuration object to be passed to MSAL instance on creation.
  * For a full list of MSAL.js configuration parameters, visit:
@@ -12,9 +15,8 @@ import { LogLevel } from "@azure/msal-browser";
  */
 export const msalConfig = {
   auth: {
-    clientId: "3eceea05-c394-4e8f-bfd9-e5a9264475de", // This is the ONLY mandatory field that you need to supply.
-    authority:
-      "https://login.microsoftonline.com/38280991-9926-4195-97d4-5d3e0e44c246", // Choose SUSI as your default authority.
+    clientId: azureClientId, // This is the ONLY mandatory field that you need to supply.
+    authority: `https://login.microsoftonline.com/${tenantId}`, // Choose SUSI as your default authority.
     redirectUri: `${window.location.origin}/`, // You must register this URI on Azure Portal/App Registration. Defaults to window.location.origin
     postLogoutRedirectUri: "/", // Indicates the page to navigate after logout.
     navigateToLoginRequestUrl: false, // If "true", will navigate back to the original request location before processing the auth code response.
@@ -57,5 +59,5 @@ export const msalConfig = {
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-  scopes: ["tasks.read"],
+  scopes: [`api://${azureClientId}/tasks.read`],
 };

@@ -1,27 +1,56 @@
-import {CreditCardOutlined, HomeOutlined, MenuOutlined, SlidersOutlined} from "@ant-design/icons";
-import UserAvatar from "./UserAvatar";
-import MenuItem from "./MenuItem";
-import {SCREENS} from "../../utils/constants.tsx";
+import MenuItem from "./NavigationMenuItem/index.tsx";
+import { SCREENS } from "../../utils/constants.tsx";
+import { Box, Typography } from "@mui/material";
+import HomeIcon from "./icons/HomeIcon.tsx";
+import MenuIcon from "./icons/MenuIcon.tsx";
+import ProfileIcon from "./icons/ProfileIcon.tsx";
+import PortofelIcon from "./icons/PortofelIcon.tsx";
 
 interface ILeftSideMenu {
-    setScreen: (screen: string) => void
+  setScreen: (screen: string) => void;
 }
 
-const LeftSideMenu = ({setScreen}: ILeftSideMenu) => {
-    return <div style={{
+const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
+  return (
+    <Box
+      sx={{
         width: "15%",
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 20
-    }}>
-        <UserAvatar image={"https://xsgames.co/randomusers/assets/avatars/male/25.jpg"}
-                    name={"Alexandru Gaita"}/>
-        <MenuItem title={"Acasa"} icon={HomeOutlined} setScreen={() => setScreen(SCREENS.HOME)}/>
-        <MenuItem title={"Meniu"} icon={MenuOutlined} setScreen={() => setScreen(SCREENS.MENU)}/>
-        <MenuItem title={"Cartele"} icon={CreditCardOutlined} setScreen={() => setScreen(SCREENS.CARD)}/>
-        <MenuItem title={"Setari"} icon={SlidersOutlined} setScreen={() => setScreen(SCREENS.SETTINGS)}/>
-    </div>
+        display: "flex",
+        bgcolor: "primary.main",
+        paddingTop: 4,
+        flexDirection: "column",
+        alignItems: "center",
+        borderRadius: "0px 8px 8px 0px",
+        gap: 1,
+      }}
+    >
+      <Typography variant="h4" color="white" fontWeight={700} paddingBottom={2}>
+        Cantina UPT
+      </Typography>
+
+      <MenuItem
+        title={"Acasa"}
+        icon={HomeIcon}
+        setScreen={() => setScreen(SCREENS.HOME)}
+      />
+      <MenuItem
+        title={"Meniu"}
+        icon={MenuIcon}
+        setScreen={() => setScreen(SCREENS.MENU)}
+      />
+      <MenuItem
+        title={"Cartele"}
+        icon={PortofelIcon}
+        setScreen={() => setScreen(SCREENS.CARD)}
+      />
+
+      <MenuItem
+        title={"Profil"}
+        icon={ProfileIcon}
+        setScreen={() => setScreen(SCREENS.PROFILE)}
+      />
+    </Box>
+  );
 };
 
 export default LeftSideMenu;

@@ -2,21 +2,22 @@
 //
 // }
 
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { COLORS } from "../../../utils/constants.tsx";
 import CheckoutItem from "../CheckoutItem/CheckoutItem.tsx";
+import { Box, Button } from "@mui/material";
 
 const imageUrl =
   "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8fA%3D%3D&w=1000&q=80";
 
 const Checkout = () => {
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexDirection: "column",
         width: 320,
-        borderLeft: "2px solid grey",
+        borderLeft: `2px solid ${COLORS.PRIMARY_COLOR}`,
         paddingTop: 15,
         paddingLeft: 15,
         paddingBottom: 15,
@@ -111,6 +112,7 @@ const Checkout = () => {
         <div
           style={{
             display: "flex",
+            marginTop: "auto",
             justifyContent: "space-between",
             width: "100%",
           }}
@@ -122,9 +124,11 @@ const Checkout = () => {
             200 lei{" "}
           </Typography.Text>
         </div>
-        <Button style={{ marginTop: "auto" }}>Place Order</Button>
+        <Button variant="outlined" sx={{ marginTop: "auto" }}>
+          Place Order
+        </Button>
       </div>
-    </div>
+    </Box>
   );
 };
 
