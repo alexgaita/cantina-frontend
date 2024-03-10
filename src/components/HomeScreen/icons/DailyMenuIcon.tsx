@@ -1,3 +1,5 @@
+import { COLORS } from "../../../utils/constants";
+
 interface ISupeIcon {
   fillColor: string;
 }

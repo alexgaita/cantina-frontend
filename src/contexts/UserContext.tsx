@@ -8,6 +8,8 @@ const UserContext = createContext<UserEntityContext>({
   user: undefined,
   setUser: () => {},
   permissions: [],
+  isAdminMode: false,
+  setIsAdminMode: () => {},
 });
 
 interface UserProviderProps {
@@ -20,6 +22,8 @@ const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<UserEntity | undefined>(undefined);
   const [permissions, setPermissions] = useState<string[]>([]);
 
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
+
   useEffect(() => {
     if (accounts.length > 0 && inProgress === InteractionStatus.None) {
       setUser({
@@ -31,9 +35,13 @@ const UserProvider = ({ children }: UserProviderProps) => {
   }, [accounts, inProgress]);
 
   const handleGetPermissions = async () => {
-    const permissions = await getUserPermissions();
-    console.log("Permissions", permissions);
-    setPermissions(permissions.permissions);
+    const permissionResponse = await getUserPermissions();
+    if (!permissionResponse) return;
+    setPermissions(permissionResponse.permissions);
+
+    if (permissionResponse.permissions.includes("ADMIN")) {
+      setIsAdminMode(localStorage.getItem("isAdminMode") === "true");
+    }
   };
 
   useEffect(() => {
@@ -44,8 +52,14 @@ const UserProvider = ({ children }: UserProviderProps) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    console.log("Permissions", permissions);
+  }, [permissions]);
+
   return (
-    <UserContext.Provider value={{ user: user, setUser, permissions }}>
+    <UserContext.Provider
+      value={{ user: user, setUser, permissions, isAdminMode, setIsAdminMode }}
+    >
       {children}
     </UserContext.Provider>
   );

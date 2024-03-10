@@ -1,16 +1,22 @@
 import MenuItem from "./NavigationMenuItem/index.tsx";
 import { SCREENS } from "../../utils/constants.tsx";
-import { Box, Typography } from "@mui/material";
+import { Box, FormControlLabel, Switch, Typography } from "@mui/material";
 import HomeIcon from "./icons/HomeIcon.tsx";
 import MenuIcon from "./icons/MenuIcon.tsx";
 import ProfileIcon from "./icons/ProfileIcon.tsx";
 import PortofelIcon from "./icons/PortofelIcon.tsx";
+import { useContext } from "react";
+import { UserContext } from "../../contexts/UserContext.tsx";
 
 interface ILeftSideMenu {
   setScreen: (screen: string) => void;
 }
 
 const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
+  const { permissions, isAdminMode, setIsAdminMode } = useContext(UserContext);
+
+  console.log("permissions", permissions);
+
   return (
     <Box
       sx={{
@@ -34,9 +40,9 @@ const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
         setScreen={() => setScreen(SCREENS.HOME)}
       />
       <MenuItem
-        title={"Meniu"}
+        title={"Comenzi"}
         icon={MenuIcon}
-        setScreen={() => setScreen(SCREENS.MENU)}
+        setScreen={() => setScreen(SCREENS.ORDERS)}
       />
       <MenuItem
         title={"Cartele"}
@@ -49,6 +55,34 @@ const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
         icon={ProfileIcon}
         setScreen={() => setScreen(SCREENS.PROFILE)}
       />
+      {permissions.some((item) => item === "ADMIN") && (
+        <Box
+          sx={{
+            width: 200,
+            backgroundColor: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: "10px",
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isAdminMode}
+                onChange={(e) => {
+                  setIsAdminMode(e.target.checked);
+                  localStorage.setItem(
+                    "isAdminMode",
+                    e.target.checked.toString()
+                  );
+                }}
+              />
+            }
+            label={<Typography variant="subtitle1">Admin Mode</Typography>}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

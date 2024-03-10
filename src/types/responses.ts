@@ -1,3 +1,5 @@
+import { MenuItemEntity, MenuItemViewEntity } from "./entities";
+
 export type UserResponse = {
   id: string;
   name: string;
@@ -8,18 +10,12 @@ export type UserPermissionsResponse = {
   permissions: string[];
 };
 
-export type DailyMenu = {
-  description: string;
+export type MenuItemResponse = {
+  menuItem: MenuItemEntity;
+  possibleContainers: string[];
 };
 
-export type NormalItem = {
-  name: string;
-  servingSize: string;
-  discountedPrice: number;
-  normalPrice: number;
-};
 
 export type MenuItemsResponse = {
-  menu: DailyMenu[];
-  normalItems: NormalItem[];
+  items: MenuItemViewEntity[];
 };

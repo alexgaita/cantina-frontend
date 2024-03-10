@@ -13,16 +13,23 @@ import {
   InteractionRequiredAuthError,
   InteractionType,
 } from "@azure/msal-browser";
-import { Box, Button } from "@mui/material";
-import axiosInstance from "./api/axiosConfig.tsx";
+import { Box } from "@mui/material";
+import AccoutScreen from "./components/AccountScreen/AccountScreen.tsx";
 
 const App = () => {
-  const [selectedScreen, setSelectedScreen] = useState(SCREENS.HOME);
+  const [selectedScreen, setSelectedScreen] = useState(
+    localStorage.getItem("selectedScreen") || SCREENS.HOME
+  );
 
   const { login, error } = useMsalAuthentication(
     InteractionType.Silent,
     loginRequest
   );
+
+  const handleSetSelectedScreen = (screen: string) => {
+    localStorage.setItem("selectedScreen", screen);
+    setSelectedScreen(screen);
+  };
 
   const handleLogin = async () => {
     try {
@@ -43,11 +50,11 @@ const App = () => {
       case SCREENS.HOME:
         return <HomeScreen />;
       case SCREENS.PROFILE:
-        return <div>Settings</div>;
+        return <AccoutScreen />;
       case SCREENS.CARD:
         return <div>Card</div>;
-      case SCREENS.MENU:
-        return <div>Menu</div>;
+      case SCREENS.ORDERS:
+        return <div>Comenzi</div>;
       default:
         return null;
     }
@@ -66,7 +73,7 @@ const App = () => {
             boxSizing: "border-box",
           }}
         >
-          <LeftSideMenu setScreen={setSelectedScreen} />
+          <LeftSideMenu setScreen={handleSetSelectedScreen} />
           <div
             style={{
               flex: 1,

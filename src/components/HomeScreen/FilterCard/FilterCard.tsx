@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { COLORS } from "../../../utils/constants.tsx";
+import { COLORS, FILTER_OPTIONS } from "../../../utils/constants.tsx";
 import { Box, SvgIcon, Typography } from "@mui/material";
 import { Image } from "@mui/icons-material";
 
 interface IFilterCard {
   image: any;
   imageHovered: any;
-  name: string;
+  option: string;
   filtersClicked: string[];
   handleClick: (filter: string) => void;
 }
@@ -14,11 +14,11 @@ interface IFilterCard {
 const FilterCard = ({
   image,
   imageHovered,
-  name,
+  option,
   filtersClicked,
   handleClick,
 }: IFilterCard) => {
-  const isClicked = filtersClicked.some((el) => el === name);
+  const isClicked = filtersClicked.some((el) => el === option);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -26,7 +26,7 @@ const FilterCard = ({
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => handleClick(name)}
+      onClick={() => handleClick(option)}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -45,7 +45,7 @@ const FilterCard = ({
         variant="subtitle2"
         style={{ color: isHovered || isClicked ? "white" : COLORS.TEXT_COLOR }}
       >
-        {name}
+        {option}
       </Typography>
     </Box>
   );

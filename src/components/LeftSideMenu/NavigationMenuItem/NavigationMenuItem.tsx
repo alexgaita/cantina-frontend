@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { COLORS } from "../../../utils/constants.tsx";
 import { Box, SvgIcon, Typography } from "@mui/material";
+import { UserContext } from "../../../contexts/UserContext.tsx";
 
 interface IMenuItem {
   title: string;
@@ -9,6 +10,7 @@ interface IMenuItem {
 }
 
 const NavigationMenuItem = ({ title, icon, setScreen }: IMenuItem) => {
+
   return (
     <Box
       onClick={setScreen}

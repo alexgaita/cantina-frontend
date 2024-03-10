@@ -2,6 +2,8 @@ export type UserEntityContext = {
   user: UserEntity | undefined;
   setUser: (user: any) => void;
   permissions: string[];
+  isAdminMode: boolean;
+  setIsAdminMode: (isAdminMode: boolean) => void;
 };
 
 export type UserEntity = {
@@ -10,11 +12,37 @@ export type UserEntity = {
   email: string;
 };
 
+export type Address = {
+  id: number;
+  value: string;
+  isCurrent: boolean;
+};
+
+export type UserEntityData = {
+  id: string;
+  phoneNumber: string;
+  addresses: Address[];
+};
+
+export type MenuItemViewEntity = {
+  name: string;
+  discountedPrice: number;
+  normalPrice: number;
+  isDailyMenu: boolean;
+  servingSize: string;
+  photoUrl: string;
+  type: string;
+};
+
 export type MenuItemEntity = {
-    name: string;
-    icon: any;
-    discountedPrice: number;
-    normalPrice: number;
-    isDailyMenu: boolean;
-    servingSize: string;
-}
+  containers: string[];
+  name: string;
+  servingSize: string;
+  discountedPrice: number;
+  normalPrice: number;
+  photoUrl: string | null;
+  type: string | null;
+  recurringDays: string[];
+  firstPossibleDay: string;
+  lastPossibleDay: string;
+};
