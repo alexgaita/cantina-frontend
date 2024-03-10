@@ -2,132 +2,201 @@
 //
 // }
 
-import { Typography } from "antd";
-import { COLORS } from "../../../utils/constants.tsx";
+import { Typography } from "@mui/material";
+import { COLORS, DEFAULT_IMAGE_URL } from "../../../utils/constants.tsx";
 import CheckoutItem from "../CheckoutItem/CheckoutItem.tsx";
 import { Box, Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import { CartItemEntity, MenuItemViewEntity } from "../../../types/entities.ts";
+import dayjs from "dayjs";
 
-const imageUrl =
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8fA%3D%3D&w=1000&q=80";
+interface CheckoutProps {
+  recalculateCart: () => void;
+}
 
-const Checkout = () => {
+const Checkout = ({ recalculateCart }: CheckoutProps) => {
+  const [cartData, setCartData] = useState<CartItemEntity[]>(
+    JSON.parse(localStorage.getItem("cartData") || JSON.stringify({ data: [] }))
+      .data
+  );
+
+  useEffect(() => {
+    setCartData(
+      JSON.parse(
+        localStorage.getItem("cartData") || JSON.stringify({ data: [] })
+      ).data
+    );
+  }, [localStorage.getItem("cartData")]);
+
+  useEffect(() => {
+    console.log("cartData", cartData);
+  }, [cartData]);
+
+  const addToCart = (item: MenuItemViewEntity) => {
+    const itemExists = cartData.some(
+      (cartItem) => cartItem.item.name === item.name
+    );
+
+    let newCart = cartData;
+
+    if (itemExists) {
+      newCart = cartData.map((cartItem) => {
+        if (cartItem.item.name === item.name) {
+          return {
+            ...cartItem,
+            quantity: cartItem.quantity + 1,
+          };
+        }
+
+        return cartItem;
+      });
+    } else {
+      newCart = [...cartData, { item, quantity: 1 }];
+    }
+
+    localStorage.setItem(
+      "cartData",
+      JSON.stringify({ data: newCart, updatedAt: dayjs().toISOString() })
+    );
+    setCartData(newCart);
+    recalculateCart();
+  };
+
+  const removeFromCart = (item: MenuItemViewEntity) => {
+    const itemExists = cartData.some(
+      (cartItem) => cartItem.item.name === item.name
+    );
+
+    if (!itemExists) return;
+
+    let newCart = cartData;
+
+    newCart = cartData.map((cartItem) => {
+      if (cartItem.item.name === item.name) {
+        return {
+          ...cartItem,
+          quantity: cartItem.quantity - 1,
+        };
+      }
+
+      return cartItem;
+    });
+
+    newCart = newCart.filter((cartItem) => cartItem.quantity > 0);
+
+    localStorage.setItem(
+      "cartData",
+      JSON.stringify({ data: newCart, updatedAt: dayjs().toISOString() })
+    );
+    setCartData(newCart);
+    recalculateCart();
+  };
+
   return (
     <Box
-      style={{
+      sx={{
         display: "flex",
         flexDirection: "column",
-        width: 320,
+        width: 350,
         borderLeft: `2px solid ${COLORS.PRIMARY_COLOR}`,
-        paddingTop: 15,
-        paddingLeft: 15,
-        paddingBottom: 15,
+        padding: 2,
         boxSizing: "border-box",
-        gap: 5,
+        gap: 2,
       }}
     >
-      <div
-        style={{
+      <Typography variant="h5" sx={{ color: "primary.main", fontWeight: 700 }}>
+        Cos de cumparaturi
+      </Typography>
+      <Box
+        sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "70%",
-          maxHeight: "70%",
           overflowY: "hidden",
+          paddingRight: 1,
           overflow: "auto",
-          gap: 4,
+          boxSizing: "border-box",
+          gap: 2,
         }}
       >
-        <CheckoutItem
-          imageUrl={imageUrl}
-          price={45}
-          name={"Ciorba de verisoare lunga"}
-          quantity={10}
-        />
-        <CheckoutItem
-          imageUrl={imageUrl}
-          price={45}
-          name={"Ciorba de verisoare lunga"}
-          quantity={10}
-        />
-        <CheckoutItem
-          imageUrl={imageUrl}
-          price={45}
-          name={"Ciorba de verisoare lunga"}
-          quantity={10}
-        />
-        <CheckoutItem
-          imageUrl={imageUrl}
-          price={45}
-          name={"Ciorba de verisoare lunga"}
-          quantity={10}
-        />
-      </div>
-      <div
-        style={{ display: "flex", flex: 1, flexDirection: "column", gap: 2 }}
+        {cartData.map((data) => (
+          <CheckoutItem
+            key={data.item.name}
+            imageUrl={data.item.photoUrl ?? DEFAULT_IMAGE_URL}
+            price={data.item.normalPrice}
+            name={data.item.name}
+            quantity={data.quantity}
+            addToCart={() => addToCart(data.item)}
+            removeFromCart={() => removeFromCart(data.item)}
+            changeQuantity={(quantity: number) =>
+              changeQuantity(data.item, quantity)
+            }
+          />
+        ))}
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flex: 0.3,
+          flexDirection: "column",
+          gap: 0.5,
+          justifyContent: "flex-end",
+          marginTop: "auto",
+          boxSizing: "border-box",
+        }}
       >
-        <div
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Typography sx={{ color: COLORS.TEXT_COLOR }}>Subtotal </Typography>
+          <Typography sx={{ color: COLORS.TEXT_COLOR }}>
+            {cartData.reduce(
+              (acc, item) => acc + item.item.normalPrice * item.quantity,
+              0
+            )}{" "}
+            lei
+          </Typography>
+        </Box>
+        <Box
           style={{
             display: "flex",
             justifyContent: "space-between",
             width: "100%",
           }}
         >
-          <Typography.Text strong style={{ color: COLORS.TEXT_COLOR }}>
-            Subtotal{" "}
-          </Typography.Text>
-          <Typography.Text strong style={{ color: COLORS.TEXT_COLOR }}>
-            100 lei{" "}
-          </Typography.Text>
-        </div>
-        <div
-          style={{
+          <Typography sx={{ color: "grey" }}>Ambalaje </Typography>
+          <Typography sx={{ color: "grey" }}>100 lei </Typography>
+        </Box>
+        <Box
+          sx={{
             display: "flex",
             justifyContent: "space-between",
             width: "100%",
           }}
         >
-          <Typography.Text strong style={{ color: "grey" }}>
-            Taxe{" "}
-          </Typography.Text>
-          <Typography.Text strong style={{ color: "grey" }}>
-            100 lei{" "}
-          </Typography.Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Typography.Text strong style={{ color: "grey" }}>
+          <Typography style={{ color: "grey" }}>
             Servicii operationale{" "}
-          </Typography.Text>
-          <Typography.Text strong style={{ color: "grey" }}>
-            100 lei{" "}
-          </Typography.Text>
-        </div>
-        <div
-          style={{ width: "100%", height: "2px", backgroundColor: "grey" }}
-        />
-        <div
-          style={{
+          </Typography>
+          <Typography style={{ color: "grey" }}>100 lei </Typography>
+        </Box>
+        <Box sx={{ width: "100%", height: "2px", backgroundColor: "grey" }} />
+        <Box
+          sx={{
             display: "flex",
-            marginTop: "auto",
             justifyContent: "space-between",
             width: "100%",
           }}
         >
-          <Typography.Text strong style={{ color: COLORS.TEXT_COLOR }}>
-            Total{" "}
-          </Typography.Text>
-          <Typography.Text strong style={{ color: COLORS.TEXT_COLOR }}>
-            200 lei{" "}
-          </Typography.Text>
-        </div>
-        <Button variant="outlined" sx={{ marginTop: "auto" }}>
+          <Typography style={{ color: COLORS.TEXT_COLOR }}>Total</Typography>
+          <Typography style={{ color: COLORS.TEXT_COLOR }}>200 lei </Typography>
+        </Box>
+        <Button sx={{ marginTop: 2 }} variant="outlined">
           Place Order
         </Button>
-      </div>
+      </Box>
     </Box>
   );
 };

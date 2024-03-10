@@ -9,29 +9,60 @@ import {
 import { COLORS } from "../../utils/constants";
 import { UserContext } from "../../contexts/UserContext";
 import { useContext, useEffect, useState } from "react";
-import { UserEntity, UserEntityData } from "../../types/entities";
-import { getUserData } from "../../api/user";
+import { Address, UserEntity, UserEntityData } from "../../types/entities";
+import { getUserData, updateUser } from "../../api/user";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AddressCard from "./AdressCard/AdressCard";
+
+const initialAddress: Address = {
+  id: 0,
+  value: "",
+  isCurrent: false,
+};
 
 const AccoutScreen = () => {
   const { user } = useContext(UserContext);
 
   const [userData, setUserData] = useState<UserEntityData>();
+  const [refethData, setRefetchData] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleGetUserData = async () => {
+    setLoading(true);
     if (!user) return;
     const response = await getUserData();
     setUserData(response);
+    setLoading(false);
   };
 
   useEffect(() => {
     handleGetUserData();
   }, [user]);
 
+  useEffect(() => {
+    if (!refethData) return;
+    handleGetUserData();
+    setRefetchData(false);
+  }, [refethData]);
+
+  const handleSaveUserData = async () => {
+    setLoading(true);
+    try {
+      await updateUser(userData);
+    } catch (e) {
+      setRefetchData(true);
+    }
+    setLoading(false);
+  };
+
   if (!user || !userData) return null;
 
-  console.log("userData", userData);
+  const deleteUnsavedAddress = () => {
+    setUserData({
+      ...userData,
+      addresses: userData.addresses.filter((address) => address.id !== 0),
+    });
+  };
 
   return (
     <Box
@@ -66,7 +97,9 @@ const AccoutScreen = () => {
           >
             Profil
           </Typography>
-          <Button variant="contained">Salveaza</Button>
+          <Button variant="contained" onClick={handleSaveUserData}>
+            Salveaza
+          </Button>
         </Box>
 
         <Box display={"flex"} gap={3}>
@@ -90,30 +123,68 @@ const AccoutScreen = () => {
           sx={{ maxWidth: 600 }}
           label="Numar de telefon"
           value={userData.phoneNumber}
+          onChange={(e) =>
+            setUserData({ ...userData, phoneNumber: e.target.value })
+          }
+          error={
+            /[^0-9]/.test(userData.phoneNumber) ||
+            userData.phoneNumber.length < 10
+          }
           variant="outlined"
         />
       </Box>
-      <Typography
-        variant="h4"
-        style={{ color: COLORS.TEXT_COLOR, fontWeight: 700 }}
-      >
-        Adresele mele
-      </Typography>{" "}
       <Box
         sx={{
           display: "flex",
-          height: "100%",
-          //   backgroundColor: "red",
-          gap: 2,
-          flexWrap: "wrap",
+          maxWidth: 600,
+          justifyContent: "space-between",
         }}
       >
-        {userData.addresses
-          .sort((address) => (address.isCurrent ? -1 : 1))
-          .map((address) => (
-            <AddressCard key={address.id} initialAddress={address} />
-          ))}
+        <Typography
+          variant="h4"
+          style={{ color: COLORS.TEXT_COLOR, fontWeight: 700 }}
+        >
+          Adresele mele
+        </Typography>{" "}
+        <Button
+          variant="contained"
+          disabled={userData.addresses.some((address) => address.id === 0)}
+          onClick={() =>
+            setUserData({
+              ...userData,
+              addresses: [
+                ...userData.addresses,
+                {
+                  ...initialAddress,
+                  isCurrent: userData.addresses.length ? false : true,
+                },
+              ],
+            })
+          }
+        >
+          Adauga adresa
+        </Button>
       </Box>
+
+      {!loading && (
+        <Box
+          sx={{
+            display: "flex",
+            height: "100%",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          {userData.addresses.map((address) => (
+            <AddressCard
+              key={address.id}
+              initialAddress={address}
+              deleteUnsavedAddress={deleteUnsavedAddress}
+              handleRefetchData={() => setRefetchData(true)}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };

@@ -46,3 +46,8 @@ export type MenuItemEntity = {
   firstPossibleDay: string;
   lastPossibleDay: string;
 };
+
+export type CartItemEntity = {
+  item: MenuItemViewEntity;
+  quantity: number;
+};

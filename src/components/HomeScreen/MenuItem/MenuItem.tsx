@@ -7,32 +7,22 @@ import {
   Typography,
   setRef,
 } from "@mui/material";
-import { COLORS } from "../../../utils/constants";
+import { COLORS, DEFAULT_IMAGE_URL } from "../../../utils/constants";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../contexts/UserContext";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EditModal from "../EditModal/EditModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteMenuItem } from "../../../api/menuItems";
+import { MenuItemViewEntity } from "../../../types/entities";
 interface IMenuItem {
-  imageUrl: string;
-  name: string;
-  normalPrice: number;
-  discountedPrice: number;
-  servingSize: string;
+  item: MenuItemViewEntity;
   isDailyMenu: boolean;
   refetchMenu: (value: boolean) => void;
+  addToCart: (item: MenuItemViewEntity) => void;
 }
 
-const MenuItem = ({
-  imageUrl,
-  name,
-  normalPrice,
-  discountedPrice,
-  servingSize,
-  isDailyMenu,
-  refetchMenu,
-}: IMenuItem) => {
+const MenuItem = ({ item, isDailyMenu, refetchMenu, addToCart }: IMenuItem) => {
   const { isAdminMode } = useContext(UserContext);
 
   const [openModal, setOpenModal] = useState(false);
@@ -45,7 +35,7 @@ const MenuItem = ({
 
   return (
     <Box
-      key={name}
+      key={item.name}
       sx={{
         width: 200,
         height: 310,
@@ -56,7 +46,7 @@ const MenuItem = ({
         <EditModal
           open={openModal}
           handleClose={() => setOpenModal(false)}
-          name={name}
+          name={item.name}
         />
       )}
 
@@ -86,8 +76,12 @@ const MenuItem = ({
           padding: 2,
         }}
       >
-        <img src={imageUrl} width={150} height={150} />
-        <Tooltip title={name} placement="top">
+        <img
+          src={item.photoUrl ?? DEFAULT_IMAGE_URL}
+          width={150}
+          height={150}
+        />
+        <Tooltip title={item.name} placement="top">
           <Typography
             variant="subtitle2"
             sx={{
@@ -99,7 +93,7 @@ const MenuItem = ({
               WebkitBoxOrient: "vertical",
             }}
           >
-            {name}
+            {item.name}
           </Typography>
         </Tooltip>
 
@@ -122,7 +116,7 @@ const MenuItem = ({
                   textDecoration: "underline",
                 }}
               >
-                {discountedPrice} lei/{servingSize}
+                {item.discountedPrice} lei/{item.servingSize}
               </Typography>
             )}
             <Typography
@@ -134,7 +128,7 @@ const MenuItem = ({
             >
               {isDailyMenu
                 ? "1 cartela/meniu"
-                : `${normalPrice} lei/${servingSize}`}
+                : `${item.normalPrice} lei/${item.servingSize}`}
             </Typography>
           </Box>
 
@@ -144,7 +138,7 @@ const MenuItem = ({
                 onClick={async () => {
                   console.log("clicked", openModal, name);
 
-                  await deleteMenuItem(name);
+                  await deleteMenuItem(item.name);
                   refetchMenu(true);
                 }}
                 variant="square"
@@ -184,7 +178,7 @@ const MenuItem = ({
             </Box>
           ) : (
             <Avatar
-              onClick={() => alert("clicked")}
+              onClick={() => addToCart(item)}
               variant="square"
               sx={{
                 bgcolor: "primary.main",

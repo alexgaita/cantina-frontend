@@ -6,21 +6,40 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
+import { deleteUserAddress, updateUserAddress } from "../../../api/user";
 interface AdressCardProps {
   initialAddress: Address;
+  deleteUnsavedAddress: () => void;
+  handleRefetchData: () => void;
 }
 
-const AddressCard = ({ initialAddress }: AdressCardProps) => {
+const AddressCard = ({
+  initialAddress,
+  deleteUnsavedAddress,
+  handleRefetchData,
+}: AdressCardProps) => {
   const [address, setAddress] = useState<Address>(initialAddress);
 
   const [isHovered, setIsHovered] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(initialAddress.id === 0 ?? false);
 
-  const handleSaveChanges = () => {
-    alert("Save changes");
+  const handleSaveChanges = async (data: Address) => {
+    await updateUserAddress(data);
     if (isEditing) {
       setIsEditing(false);
     }
+
+    handleRefetchData();
+  };
+
+  const handleDeleteAddress = async () => {
+    if (address.id === 0) {
+      deleteUnsavedAddress();
+      return;
+    }
+
+    await deleteUserAddress(address.id);
+    handleRefetchData();
   };
 
   return (
@@ -30,7 +49,7 @@ const AddressCard = ({ initialAddress }: AdressCardProps) => {
       onMouseLeave={() => setIsHovered(false)}
       sx={{
         width: 500,
-        minHeight: 80,
+        minHeight: 130,
         maxHeight: 130,
         border: `1px solid ${
           address.isCurrent ? COLORS.PRIMARY_COLOR : "grey"
@@ -47,16 +66,22 @@ const AddressCard = ({ initialAddress }: AdressCardProps) => {
         boxSizing: "border-box",
       }}
     >
-      <Tooltip title={"Selecteaza locatia implicita"} placement="top">
-        <IconButton>
-          <LocationOnIcon
-            style={{
-              color: address.isCurrent ? COLORS.PRIMARY_COLOR : "grey",
-              fontSize: 50,
+      {address.id !== 0 && (
+        <Tooltip title={"Selecteaza locatia implicita"} placement="top">
+          <IconButton
+            onClick={() => {
+              handleSaveChanges({ ...address, isCurrent: true });
             }}
-          />
-        </IconButton>
-      </Tooltip>
+          >
+            <LocationOnIcon
+              style={{
+                color: address.isCurrent ? COLORS.PRIMARY_COLOR : "grey",
+                fontSize: 50,
+              }}
+            />
+          </IconButton>
+        </Tooltip>
+      )}
 
       {isEditing ? (
         <TextField
@@ -94,7 +119,7 @@ const AddressCard = ({ initialAddress }: AdressCardProps) => {
         {isHovered && (
           <>
             {isEditing ? (
-              <IconButton onClick={handleSaveChanges}>
+              <IconButton onClick={() => handleSaveChanges(address)}>
                 <CheckIcon
                   style={{
                     color: COLORS.PRIMARY_COLOR,
@@ -114,7 +139,7 @@ const AddressCard = ({ initialAddress }: AdressCardProps) => {
               </IconButton>
             )}
 
-            <IconButton>
+            <IconButton onClick={handleDeleteAddress}>
               <DeleteIcon
                 style={{
                   color: COLORS.PRIMARY_COLOR,

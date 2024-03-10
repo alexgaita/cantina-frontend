@@ -24,7 +24,11 @@ import ShoppingCartOutlined from "@ant-design/icons/lib/icons/ShoppingCartOutlin
 import MenuItem from "./MenuItem/MenuItem.tsx";
 import { getMenuItems, uploadMenu } from "../../api/menuItems.tsx";
 import DailyMenuIcon from "./icons/DailyMenuIcon.tsx";
-import { MenuItemEntity, MenuItemViewEntity } from "../../types/entities.ts";
+import {
+  CartItemEntity,
+  MenuItemEntity,
+  MenuItemViewEntity,
+} from "../../types/entities.ts";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { UserContext } from "../../contexts/UserContext.tsx";
 import axiosInstance from "../../api/axiosConfig.tsx";
@@ -32,9 +36,7 @@ import { useSnackbar } from "notistack";
 import Filters from "./Filters/Filters.tsx";
 import CreateModal from "./EditModal/CreateModal.tsx";
 import SugestionsModal from "./EditModal/SugestionsModal.tsx";
-
-const imageUrl =
-  "https://www.freeiconspng.com/thumbs/fast-food-png/fast-food-png-most-popular-fast-food-snacks-in-your-area-and-most--3.png";
+import dayjs from "dayjs";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -62,6 +64,59 @@ const HomeScreen = () => {
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [possibleContainers, setPossibleContainers] = useState<string[]>([]);
   const [suggestionItems, setSuggestionItems] = useState<MenuItemEntity[]>([]);
+
+  const [recalculateCart, setRecalculateCart] = useState(false);
+
+  const getCartLength = () => {
+    const localCart: CartItemEntity[] = JSON.parse(
+      localStorage.getItem("cartData") || JSON.stringify({ data: [] })
+    ).data;
+
+    console.log("localCart", localCart);
+
+    return localCart.reduce((acc, curr) => acc + curr.quantity, 0);
+  };
+
+  const [cartLength, setCartLength] = useState(getCartLength());
+
+  useEffect(() => {
+    if (!recalculateCart) return;
+    setCartLength(getCartLength());
+    setRecalculateCart(false);
+  }, [recalculateCart]);
+
+  const addToCart = (item: MenuItemViewEntity) => {
+    const localCart: CartItemEntity[] = JSON.parse(
+      localStorage.getItem("cartData") || JSON.stringify({ data: [] })
+    ).data;
+
+    const itemExists = localCart.some(
+      (cartItem) => cartItem.item.name === item.name
+    );
+
+    let newCart = localCart;
+
+    if (itemExists) {
+      newCart = localCart.map((cartItem) => {
+        if (cartItem.item.name === item.name) {
+          return {
+            ...cartItem,
+            quantity: cartItem.quantity + 1,
+          };
+        }
+
+        return cartItem;
+      });
+    } else {
+      newCart = [...localCart, { item, quantity: 1 }];
+    }
+
+    localStorage.setItem(
+      "cartData",
+      JSON.stringify({ data: newCart, updatedAt: dayjs().toISOString() })
+    );
+    setCartLength((prev) => prev + 1);
+  };
 
   const [loadingMenu, setLoadingMenu] = useState(false);
 
@@ -198,7 +253,7 @@ const HomeScreen = () => {
               </Button>
             </>
           ) : (
-            <Badge badgeContent={1} color="error">
+            <Badge badgeContent={cartLength} color="error">
               <IconButton
                 onClick={() => setCartOpen(!cartOpen)}
                 sx={{
@@ -255,18 +310,17 @@ const HomeScreen = () => {
             .map((item) => (
               <MenuItem
                 key={item.name}
-                imageUrl={item.photoUrl ?? imageUrl}
+                item={item}
                 isDailyMenu={item.type === "DAILY_MENU"}
-                name={item.name}
-                normalPrice={item.normalPrice}
-                discountedPrice={item.discountedPrice}
-                servingSize={item.servingSize}
                 refetchMenu={setRefetchMenu}
+                addToCart={addToCart}
               />
             ))}
         </div>
       </div>
-      {cartOpen && <Checkout />}
+      {cartOpen && (
+        <Checkout recalculateCart={() => setRecalculateCart(true)} />
+      )}
       {createModalOpen && (
         <CreateModal
           open={createModalOpen}
