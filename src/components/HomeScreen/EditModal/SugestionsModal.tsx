@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Divider, Modal } from "@mui/material";
-import {
-  getFilterOptionByValue,
-  getValueFromKey,
-} from "../../../utils/constants";
+import { getFilterOptionByValue } from "../../../utils/constants";
 import { createOrUpdateMenuItem } from "../../../api/menuItems";
 import { MenuItemEntity } from "../../../types/entities";
 import ItemModal from "./ItemModal";
-import dayjs from "dayjs";
-import { getAllContainers } from "../../../api/containers";
 
 interface SugestionsModalProps {
   open: boolean;

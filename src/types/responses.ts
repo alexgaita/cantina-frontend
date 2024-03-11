@@ -1,4 +1,8 @@
-import { MenuItemEntity, MenuItemViewEntity } from "./entities";
+import {
+  ContainerEntity,
+  MenuItemEntity,
+  MenuItemViewEntity,
+} from "./entities";
 
 export type UserResponse = {
   id: string;
@@ -15,7 +19,10 @@ export type MenuItemResponse = {
   possibleContainers: string[];
 };
 
-
 export type MenuItemsResponse = {
   items: MenuItemViewEntity[];
+};
+
+export type MenuItemContainerResponse = {
+  items: Record<string, ContainerEntity[]>;
 };

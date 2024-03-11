@@ -15,11 +15,11 @@ import {
 } from "@azure/msal-browser";
 import { Box } from "@mui/material";
 import AccoutScreen from "./components/AccountScreen/AccountScreen.tsx";
+import { UserContext } from "./contexts/UserContext.tsx";
+import CartScreen from "./components/CartScreen/CartScreen.tsx";
 
 const App = () => {
-  const [selectedScreen, setSelectedScreen] = useState(
-    localStorage.getItem("selectedScreen") || SCREENS.HOME
-  );
+  const { selectedScreen, setSelectedScreen } = useContext(UserContext);
 
   const { login, error } = useMsalAuthentication(
     InteractionType.Silent,
@@ -49,6 +49,8 @@ const App = () => {
     switch (selectedScreen) {
       case SCREENS.HOME:
         return <HomeScreen />;
+      case SCREENS.CART:
+        return <CartScreen />;
       case SCREENS.PROFILE:
         return <AccoutScreen />;
       case SCREENS.CARD:

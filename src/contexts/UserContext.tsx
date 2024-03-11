@@ -3,6 +3,7 @@ import { UserEntity, UserEntityContext } from "../types/entities";
 import { useMsal } from "@azure/msal-react";
 import { getUserPermissions } from "../api/user";
 import { InteractionStatus } from "@azure/msal-browser";
+import { SCREENS } from "../utils/constants";
 
 const UserContext = createContext<UserEntityContext>({
   user: undefined,
@@ -10,6 +11,8 @@ const UserContext = createContext<UserEntityContext>({
   permissions: [],
   isAdminMode: false,
   setIsAdminMode: () => {},
+  selectedScreen: SCREENS.HOME,
+  setSelectedScreen: () => {},
 });
 
 interface UserProviderProps {
@@ -21,6 +24,9 @@ const UserProvider = ({ children }: UserProviderProps) => {
 
   const [user, setUser] = useState<UserEntity | undefined>(undefined);
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [selectedScreen, setSelectedScreen] = useState(
+    localStorage.getItem("selectedScreen") || SCREENS.HOME
+  );
 
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
 
@@ -58,7 +64,15 @@ const UserProvider = ({ children }: UserProviderProps) => {
 
   return (
     <UserContext.Provider
-      value={{ user: user, setUser, permissions, isAdminMode, setIsAdminMode }}
+      value={{
+        user: user,
+        setUser,
+        permissions,
+        isAdminMode,
+        setIsAdminMode,
+        selectedScreen,
+        setSelectedScreen,
+      }}
     >
       {children}
     </UserContext.Provider>

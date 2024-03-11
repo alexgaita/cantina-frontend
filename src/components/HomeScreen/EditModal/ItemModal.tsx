@@ -50,6 +50,8 @@ const ItemModal = ({
     setLoading(false);
   };
 
+  console.log("isDailyMenu", item.type, item.type === "Meniul zilei");
+
   const isDailyMenu = getFilterOptionByValue(item.type) === "DAILY_MENU";
 
   return (
@@ -171,7 +173,7 @@ const ItemModal = ({
             aria-label="text formatting"
           >
             {Object.keys(WEEK_DAYS).map((day) => (
-              <ToggleButton key={day} value={day} aria-label={day}>
+              <ToggleButton value={day} aria-label={day}>
                 {WEEK_DAYS[day as keyof typeof WEEK_DAYS]}
               </ToggleButton>
             ))}

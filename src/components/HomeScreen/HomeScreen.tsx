@@ -26,6 +26,7 @@ import { getMenuItems, uploadMenu } from "../../api/menuItems.tsx";
 import DailyMenuIcon from "./icons/DailyMenuIcon.tsx";
 import {
   CartItemEntity,
+  CartStorage,
   MenuItemEntity,
   MenuItemViewEntity,
 } from "../../types/entities.ts";
@@ -68,13 +69,26 @@ const HomeScreen = () => {
   const [recalculateCart, setRecalculateCart] = useState(false);
 
   const getCartLength = () => {
-    const localCart: CartItemEntity[] = JSON.parse(
+    const localCart: CartStorage = JSON.parse(
       localStorage.getItem("cartData") || JSON.stringify({ data: [] })
-    ).data;
+    );
+
+    const localCartData = localCart.data;
 
     console.log("localCart", localCart);
 
-    return localCart.reduce((acc, curr) => acc + curr.quantity, 0);
+    if (
+      localCart.updatedAt &&
+      !dayjs().isSame(dayjs(localCart.updatedAt), "day")
+    ) {
+      localStorage.setItem(
+        "cartData",
+        JSON.stringify({ data: [], updatedAt: dayjs().toISOString() })
+      );
+      return 0;
+    }
+
+    return localCartData.reduce((acc, curr) => acc + curr.quantity, 0);
   };
 
   const [cartLength, setCartLength] = useState(getCartLength());

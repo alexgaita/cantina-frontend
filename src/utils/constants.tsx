@@ -2,6 +2,7 @@ export const SCREENS = {
   HOME: "home",
   PROFILE: "profile",
   ORDERS: "orders",
+  CART: "cart",
   CARD: "card",
 };
 

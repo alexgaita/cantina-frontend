@@ -1,9 +1,12 @@
+import { Container } from "./responses";
 export type UserEntityContext = {
   user: UserEntity | undefined;
   setUser: (user: any) => void;
   permissions: string[];
   isAdminMode: boolean;
   setIsAdminMode: (isAdminMode: boolean) => void;
+  selectedScreen: string;
+  setSelectedScreen: (screen: string) => void;
 };
 
 export type UserEntity = {
@@ -47,7 +50,17 @@ export type MenuItemEntity = {
   lastPossibleDay: string;
 };
 
+export type CartStorage = {
+  data: CartItemEntity[];
+  updatedAt: string;
+};
+
 export type CartItemEntity = {
   item: MenuItemViewEntity;
   quantity: number;
+};
+
+export type ContainerEntity = {
+  name: string;
+  price: number;
 };

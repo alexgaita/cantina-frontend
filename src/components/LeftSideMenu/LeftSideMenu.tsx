@@ -7,6 +7,7 @@ import ProfileIcon from "./icons/ProfileIcon.tsx";
 import PortofelIcon from "./icons/PortofelIcon.tsx";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext.tsx";
+import CartIcon from "./icons/CartIcon.tsx";
 
 interface ILeftSideMenu {
   setScreen: (screen: string) => void;
@@ -34,27 +35,6 @@ const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
         Cantina UPT
       </Typography>
 
-      <MenuItem
-        title={"Acasa"}
-        icon={HomeIcon}
-        setScreen={() => setScreen(SCREENS.HOME)}
-      />
-      <MenuItem
-        title={"Comenzi"}
-        icon={MenuIcon}
-        setScreen={() => setScreen(SCREENS.ORDERS)}
-      />
-      <MenuItem
-        title={"Cartele"}
-        icon={PortofelIcon}
-        setScreen={() => setScreen(SCREENS.CARD)}
-      />
-
-      <MenuItem
-        title={"Profil"}
-        icon={ProfileIcon}
-        setScreen={() => setScreen(SCREENS.PROFILE)}
-      />
       {permissions.some((item) => item === "ADMIN") && (
         <Box
           sx={{
@@ -82,6 +62,38 @@ const LeftSideMenu = ({ setScreen }: ILeftSideMenu) => {
             label={<Typography variant="subtitle1">Admin Mode</Typography>}
           />
         </Box>
+      )}
+
+      <MenuItem
+        title={"Acasa"}
+        icon={HomeIcon}
+        setScreen={() => setScreen(SCREENS.HOME)}
+      />
+
+      <MenuItem
+        title={"Comenzi"}
+        icon={MenuIcon}
+        setScreen={() => setScreen(SCREENS.ORDERS)}
+      />
+
+      <MenuItem
+        title={"Profil"}
+        icon={ProfileIcon}
+        setScreen={() => setScreen(SCREENS.PROFILE)}
+      />
+      {!isAdminMode && (
+        <>
+          <MenuItem
+            title={"Cos"}
+            icon={CartIcon}
+            setScreen={() => setScreen(SCREENS.CART)}
+          />
+          <MenuItem
+            title={"Cartele"}
+            icon={PortofelIcon}
+            setScreen={() => setScreen(SCREENS.CARD)}
+          />
+        </>
       )}
     </Box>
   );
