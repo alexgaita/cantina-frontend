@@ -12,7 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 import { COLORS, DEFAULT_IMAGE_URL } from "../../utils/constants";
-import { CartItemEntity, MenuItemViewEntity } from "../../types/entities";
+import {
+  CartItemEntity,
+  MenuItemViewEntity,
+  OrderCreateEntity,
+} from "../../types/entities";
 import { useEffect, useState } from "react";
 import CheckoutItem from "../HomeScreen/CheckoutItem/CheckoutItem";
 import dayjs from "dayjs";
@@ -23,22 +27,22 @@ import { getContainersForMenuItem } from "../../api/containers";
 import { MenuItemContainerResponse } from "../../types/responses";
 import CheckoutModal from "../HomeScreen/EditModal/CheckoutModal";
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
+import { placeOrder } from "../../api/order";
+import { useSnackbar } from "notistack";
 
 const stripePromise = loadStripe(
   "pk_test_51OtCa009qVtJy5jRISxekwwFVwZ9f4JOe5qxr4zLafhbiXZLzHx3glNK54Hdq6PPQAHQRFp6GBh0ri4Vf2fybT2K00aatSKrWk"
 );
-
-const options = {
-  // passing the client secret obtained from the server
-  clientSecret: "pi_3OtDKC09qVtJy5jR0XvTzHF5_secret_KT8WM8f8ukXEwJamWXSgpvsOp",
-};
 
 const CartScreen = () => {
   const [cartData, setCartData] = useState<CartItemEntity[]>(
     JSON.parse(localStorage.getItem("cartData") || JSON.stringify({ data: [] }))
       .data
   );
+
+  const [orderId, setOrderId] = useState<number>(0);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const [openModal, setOpenModal] = useState(false);
   const [useSilverware, setUseSilverware] = useState(true);
@@ -189,6 +193,48 @@ const CartScreen = () => {
     price += 10; // transport
 
     return Number(price.toFixed(2));
+  };
+
+  const handlePlaceOrder = async () => {
+    const order: OrderCreateEntity = {
+      items: cartData.map((cartItem) => ({
+        productId: cartItem.item.name,
+        quantity: cartItem.quantity,
+      })),
+      comment: comment,
+      discountIds: [],
+      wantSilverware: useSilverware,
+      byCard: paymentMethod === "card",
+    };
+
+    const response = await placeOrder(order);
+
+    setClientSecret(response.clientSecret);
+    setOrderId(response.orderId);
+    setOpenModal(true);
+
+    console.log("response order create", response);
+  };
+
+  const renderCheckoutModal = () => {
+    const options: StripeElementsOptions = clientSecret
+      ? { clientSecret, locale: "ro" }
+      : { mode: "payment", locale: "ro" };
+
+    return (
+      <Elements stripe={stripePromise} options={options}>
+        <CheckoutModal
+          orderId={orderId}
+          cartData={cartData}
+          totalPrice={computeTotalPrice()}
+          open={openModal}
+          handleClose={() => setOpenModal(false)}
+          wantSilverware={useSilverware}
+          payByCard={paymentMethod === "card"}
+          comment={comment}
+        />
+      </Elements>
+    );
   };
 
   return (
@@ -490,25 +536,13 @@ const CartScreen = () => {
           <Button
             variant="contained"
             disabled={!cartData.length}
-            onClick={() => setOpenModal(true)}
+            onClick={handlePlaceOrder}
           >
             Trimite Comanda
           </Button>
         </Box>
       </Box>
-      {openModal && (
-        <Elements stripe={stripePromise} options={options}>
-          <CheckoutModal
-            cartData={cartData}
-            totalPrice={computeTotalPrice()}
-            open={openModal}
-            handleClose={() => setOpenModal(false)}
-            wantSilverware={useSilverware}
-            payByCard={paymentMethod === "card"}
-            comment={comment}
-          />
-        </Elements>
-      )}
+      {openModal && renderCheckoutModal()}
     </Box>
   );
 };

@@ -17,6 +17,7 @@ import { Box } from "@mui/material";
 import AccoutScreen from "./components/AccountScreen/AccountScreen.tsx";
 import { UserContext } from "./contexts/UserContext.tsx";
 import CartScreen from "./components/CartScreen/CartScreen.tsx";
+import { loadStripe } from "@stripe/stripe-js";
 
 const App = () => {
   const { selectedScreen, setSelectedScreen } = useContext(UserContext);

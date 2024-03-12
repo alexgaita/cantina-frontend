@@ -22,6 +22,7 @@ import { UserContext } from "../../../contexts/UserContext";
 import { getUserData } from "../../../api/user";
 import { COLORS } from "../../../utils/constants";
 import {
+  Elements,
   ExpressCheckoutElement,
   PaymentElement,
   useElements,
@@ -29,8 +30,12 @@ import {
 } from "@stripe/react-stripe-js";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import { confirmOrder } from "../../../api/order";
+import { useSnackbar } from "notistack";
+import { loadStripe } from "@stripe/stripe-js";
 
 interface ICheckoutModal {
+  orderId: number;
   totalPrice: number;
   open: boolean;
   handleClose: () => void;
@@ -41,6 +46,7 @@ interface ICheckoutModal {
 }
 
 const CheckoutModal = ({
+  orderId,
   open,
   handleClose,
   totalPrice,
@@ -49,9 +55,11 @@ const CheckoutModal = ({
   cartData,
   comment,
 }: ICheckoutModal) => {
-  const { user } = useContext(UserContext);
+  const { user, setSelectedScreen } = useContext(UserContext);
   const stripe = useStripe();
   const elements = useElements();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   console.log("coment", comment);
 
@@ -71,6 +79,18 @@ const CheckoutModal = ({
   useEffect(() => {
     handleGetUserData();
   }, []);
+
+  const handleNormalSubmit = async () => {
+    try {
+      await confirmOrder(orderId);
+      handleClose();
+      localStorage.removeItem("cartData");
+      setSelectedScreen("home");
+      enqueueSnackbar("Comanda plasata cu succes", { variant: "success" });
+    } catch (e) {
+      enqueueSnackbar("Eroare la plasarea comenzii", { variant: "error" });
+    }
+  };
 
   const handleSubmit = async (event: any) => {
     // We don't want to let default form submission happen here,
@@ -101,7 +121,10 @@ const CheckoutModal = ({
       // Your customer will be redirected to your `return_url`. For some payment
       // methods like iDEAL, your customer will be redirected to an intermediate
       // site first to authorize the payment, then redirected to the `return_url`.
-      alert("Payment completed");
+      handleClose();
+      localStorage.removeItem("cartData");
+      setSelectedScreen("home");
+      enqueueSnackbar("Comanda plasata cu succes", { variant: "success" });
     }
   };
 
@@ -214,7 +237,17 @@ const CheckoutModal = ({
         </Box>
         {payByCard && <PaymentElement />}
 
-        <Button variant="contained" onClick={handleSubmit} color="primary">
+        <Button
+          variant="contained"
+          onClick={(event) => {
+            if (payByCard) {
+              handleSubmit(event);
+            } else {
+              handleNormalSubmit();
+            }
+          }}
+          color="primary"
+        >
           Checkout
         </Button>
       </Box>

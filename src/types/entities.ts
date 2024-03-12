@@ -64,3 +64,16 @@ export type ContainerEntity = {
   name: string;
   price: number;
 };
+
+export type OrderItem = {
+  productId: string;
+  quantity: number;
+};
+
+export type OrderCreateEntity = {
+  items: OrderItem[];
+  comment: string | null;
+  discountIds: string[];
+  wantSilverware: boolean;
+  byCard: boolean;
+};

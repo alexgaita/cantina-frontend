@@ -26,3 +26,8 @@ export type MenuItemsResponse = {
 export type MenuItemContainerResponse = {
   items: Record<string, ContainerEntity[]>;
 };
+
+export type InitialOrderResponse = {
+  orderId: number;
+  clientSecret: string | null;
+};
